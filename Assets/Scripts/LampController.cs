@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
 
@@ -15,7 +16,7 @@ public class LampController : MonoBehaviour
     public float rotationSmoothTime = 0.1f;  // 灯光旋转的平滑时间
 
     private float currentIntensity;  // 当前亮度
-    private float currentRange;  // 当前范围
+    public float currentRange;  // 当前范围
     private float intensityVelocity = 0f;  // 亮度平滑的速度
     private float rangeVelocity = 0f;  // 范围平滑的速度
     private Vector3 currentVelocity = Vector3.zero;  // 旋转平滑的速度

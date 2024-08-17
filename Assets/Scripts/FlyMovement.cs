@@ -41,26 +41,26 @@ public class FlyMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // Check if the X key is being pressed
-        if (Input.GetKey(KeyCode.X))
-        {
-            // Set the state to fly towards the fixed target
-            isFlyingToTarget = true;
-        }
-        else
-        {
-            // If the X key was released, update the originPosition to the current position
-            if (isFlyingToTarget)
-            {
-                originPosition = transform.position;
-                isFlyingToTarget = false;
-                timer = 0f; // Reset timer to avoid immediate direction change
-                targetPosition = originPosition + new Vector2(
-                    Random.Range(-1f, 1f),
-                    Random.Range(-1f, 1f)
-                ).normalized * moveRadius;
-            }
-        }
+        // // Check if the X key is being pressed
+        // if (Input.GetKey(KeyCode.X))
+        // {
+        //     // Set the state to fly towards the fixed target
+        //     isFlyingToTarget = true;
+        // }
+        // else
+        // {
+        //     // If the X key was released, update the originPosition to the current position
+        //     if (isFlyingToTarget)
+        //     {
+        //         originPosition = transform.position;
+        //         isFlyingToTarget = false;
+        //         timer = 0f; // Reset timer to avoid immediate direction change
+        //         targetPosition = originPosition + new Vector2(
+        //             Random.Range(-1f, 1f),
+        //             Random.Range(-1f, 1f)
+        //         ).normalized * moveRadius;
+        //     }
+        // }
 
         if (isFlyingToTarget)
         {
@@ -96,5 +96,29 @@ public class FlyMovement : MonoBehaviour
         // Add a floating effect
         float floatOffset = Mathf.Sin(Time.time * floatSpeed) * floatAmplitude;
         transform.localScale = new Vector3(0.3f, 0.3f + 0.3f * floatOffset, 0.3f);
+    }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        // 检查进入的物体是否是目标物体
+        if (other.CompareTag("LampLight"))
+        {
+            isFlyingToTarget = true;
+        }
+    }
+
+    void OnTriggerExit2D(Collider2D other)
+    {
+        // 检查进入的物体是否是目标物体
+        if (other.CompareTag("LampLight") && isFlyingToTarget)
+        {
+            originPosition = transform.position;
+            isFlyingToTarget = false;
+            timer = 0f; // Reset timer to avoid immediate direction change
+            targetPosition = originPosition + new Vector2(
+                Random.Range(-1f, 1f),
+                Random.Range(-1f, 1f)
+            ).normalized * moveRadius;
+        }
     }
 }
