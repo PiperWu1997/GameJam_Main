@@ -1,6 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class FlyMovement : MonoBehaviour
 {
@@ -9,28 +8,60 @@ public class FlyMovement : MonoBehaviour
     public float moveRadius = 2f; // Movement radius
     public float floatAmplitude = 0.1f; // Amplitude of the floating effect
     public float floatSpeed = 2f; // Speed of the floating effect
+    public int scoreValue = 1; // Value to add to score when a fly is collected
 
-    protected Vector2 originPosition;
-    protected Vector2 targetPosition;  // 修改为protected
+    protected Vector2 originPosition; // Changed to protected
+    protected Vector2 targetPosition; // Changed to protected
     public Vector2 fixedTargetPosition = new Vector2(0f, 0f); // The fixed target position to fly towards
 
-    private float changeDirectionTime = 1f; // Time interval for changing direction
-    protected float timer = 0f;  // 修改为protected
+    protected float changeDirectionTime = 1f; // Changed to protected
+    protected float timer = 0f; // Changed to protected
+    protected bool isFlyingToTarget = false; // Changed to protected
 
-    protected bool isFlyingToTarget = false;  // 已修改为protected
+    public float destroyRadius = 0.5f; // Radius to detect if near the center
 
-    void Start()
+    protected LampController lampController; // Reference to the LampController script
+    private ScoreManager scoreManager; // Reference to the ScoreManager script
+
+    protected virtual void Start()
     {
         originPosition = transform.position;
         targetPosition = originPosition;
         slowSpeed = speed * 0.5f;
+
+        // Find the LampController component in the scene
+        lampController = FindObjectOfType<LampController>();
+        if (lampController == null)
+        {
+            Debug.LogError("LampController not found in the scene.");
+        }
+
+        // Find the ScoreManager component in the scene
+        scoreManager = FindObjectOfType<ScoreManager>();
+        if (scoreManager == null)
+        {
+            Debug.LogError("ScoreManager not found in the scene.");
+        }
     }
 
-    void Update()
+    private void Update()
     {
         if (isFlyingToTarget)
         {
             transform.position = Vector2.MoveTowards(transform.position, fixedTargetPosition, Time.deltaTime * slowSpeed);
+
+            if (Vector2.Distance(transform.position, fixedTargetPosition) <= destroyRadius)
+            {
+                if (lampController != null)
+                {
+                    lampController.IncreaseBattery(5f); // Increase battery by a specified amount
+                }
+                if (scoreManager != null)
+                {
+                    scoreManager.AddScore(scoreValue); // Add score
+                }
+                Destroy(gameObject); // Destroy the fly object
+            }
         }
         else
         {
@@ -56,7 +87,7 @@ public class FlyMovement : MonoBehaviour
         transform.localScale = new Vector3(0.3f, 0.3f + 0.3f * floatOffset, 0.3f);
     }
 
-    void OnTriggerEnter2D(Collider2D other)
+    private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("LampLight"))
         {
@@ -64,7 +95,7 @@ public class FlyMovement : MonoBehaviour
         }
     }
 
-    void OnTriggerExit2D(Collider2D other)
+    private void OnTriggerExit2D(Collider2D other)
     {
         if (other.CompareTag("LampLight") && isFlyingToTarget)
         {
