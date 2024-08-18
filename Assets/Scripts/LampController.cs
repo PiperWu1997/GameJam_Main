@@ -1,70 +1,77 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;  // 需要引入此命名空间以使用场景管理
 
 public class LampController : MonoBehaviour
 {
-    public UnityEngine.Rendering.Universal.Light2D lampLight;  // Reference to Light2D component
-    public float maxIntensity = 5f;  // Maximum intensity of the light
-    public float minIntensity = 0f;  // Minimum intensity of the light
-    public float maxRange = 5f;  // Maximum range of the light
-    public float minRange = 0f;  // Minimum range of the light
-    public float intensityIncreaseRate = 1f;  // Rate of intensity increase
-    public float rangeIncreaseRate = 1f;  // Rate of range increase
-    public float smoothTime = 0.5f;  // Smooth time for decreasing intensity and range
-    public float rotationSmoothTime = 0.1f;  // Smooth time for light rotation
-    public float batteryConsumptionRate = 10f;  // Rate of battery consumption
-    public float maxBattery = 100f;  // Maximum battery level
-    public Slider batterySlider;  // Reference to the battery slider
-    public float batteryIncreaseAmount = 20f;  // Amount of battery increase
+    public UnityEngine.Rendering.Universal.Light2D lampLight;  // Light2D 组件的引用
+    public float maxIntensity = 5f;  // 灯光的最大强度
+    public float minIntensity = 0f;  // 灯光的最小强度
+    public float maxRange = 5f;  // 灯光的最大范围
+    public float minRange = 0f;  // 灯光的最小范围
+    public float intensityIncreaseRate = 1f;  // 强度增加的速率
+    public float rangeIncreaseRate = 1f;  // 范围增加的速率
+    public float smoothTime = 0.5f;  // 用于平滑减少强度和范围的时间
+    public float rotationSmoothTime = 0.1f;  // 灯光旋转的平滑时间
+    public float batteryConsumptionRate = 10f;  // 电池消耗速率
+    public float maxBattery = 100f;  // 最大电池电量
+    public Slider batterySlider;  // 电池滑动条的引用
+    public float batteryIncreaseAmount = 20f;  // 电池增加的量
 
-    private float currentIntensity;  // Current intensity
-    public float currentRange;  // Current range
-    private float currentBattery;  // Current battery level
-    private float intensityVelocity = 0f;  // Intensity smoothing velocity
-    private float rangeVelocity = 0f;  // Range smoothing velocity
-    private Vector3 currentVelocity = Vector3.zero;  // Rotation smoothing velocity
+    private float currentIntensity;  // 当前强度
+    public float currentRange;  // 当前范围
+    private float currentBattery;  // 当前电池电量
+    private float intensityVelocity = 0f;  // 强度平滑的速度
+    private float rangeVelocity = 0f;  // 范围平滑的速度
+    private Vector3 currentVelocity = Vector3.zero;  // 旋转平滑的速度
 
     void Start()
     {
-        currentBattery = maxBattery;  // Initialize battery to max value
-        batterySlider.maxValue = maxBattery;  // Set the max value of the slider
-        batterySlider.value = currentBattery;  // Initialize the slider value
+        currentBattery = maxBattery;  // 将电池电量初始化为最大值
+        batterySlider.maxValue = maxBattery;  // 设置滑动条的最大值
+        batterySlider.value = currentBattery;  // 初始化滑动条的值
     }
 
     void Update()
     {
-        if (Input.GetMouseButton(0))  // While holding down the left mouse button
+        if (Input.GetMouseButton(0))  // 按住左键时
         {
-            // Increase light intensity and range
+            // 增加灯光的强度和范围
             currentIntensity = Mathf.Clamp(currentIntensity + intensityIncreaseRate * Time.deltaTime, minIntensity, maxIntensity);
             currentRange = Mathf.Clamp(currentRange + rangeIncreaseRate * Time.deltaTime, minRange, maxRange);
 
-            // Calculate battery consumption based on intensity
+            // 根据强度计算电池消耗
             float batteryConsumption = batteryConsumptionRate * currentIntensity * Time.deltaTime;
             currentBattery = Mathf.Clamp(currentBattery - batteryConsumption, 0, maxBattery);
 
-            // Update the battery slider
+            // 更新电池滑动条
             batterySlider.value = currentBattery;
         }
         else
         {
-            // Smoothly decrease light intensity and range when mouse is not held down
+            // 当鼠标没有按下时，平滑地减少灯光强度和范围
             currentIntensity = Mathf.SmoothDamp(currentIntensity, minIntensity, ref intensityVelocity, smoothTime);
             currentRange = Mathf.SmoothDamp(currentRange, minRange, ref rangeVelocity, smoothTime);
         }
 
-        // Apply light intensity and range
+        // 应用灯光的强度和范围
         lampLight.intensity = currentIntensity;
         lampLight.pointLightOuterRadius = currentRange;
 
-        // Control light direction
+        // 控制灯光方向
         Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 direction = mousePosition - transform.position;
         float targetAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
-        // Smoothly rotate the light
+        // 平滑旋转灯光
         float smoothedAngle = Mathf.SmoothDampAngle(transform.eulerAngles.z, targetAngle - 90, ref currentVelocity.z, rotationSmoothTime);
         transform.rotation = Quaternion.Euler(0, 0, smoothedAngle);
+
+        // 检测电池电量是否为 0
+        if (batterySlider.value <= 0)
+        {
+            LoadNextLevel();
+        }
     }
 
     public void DecreaseBattery(float amount)
@@ -72,11 +79,12 @@ public class LampController : MonoBehaviour
         currentBattery = Mathf.Clamp(currentBattery - amount, 0, maxBattery);
         batterySlider.value = currentBattery;
 
-        // Handle battery depletion logic if needed
+        // 处理电池耗尽逻辑
         if (currentBattery <= 0)
         {
-            // For example, turn off the light
+            // 例如，关闭灯光
             lampLight.enabled = false;
+            LoadNextLevel();  // 电池耗尽时也可以调用加载下一关
         }
     }
 
@@ -84,5 +92,11 @@ public class LampController : MonoBehaviour
     {
         currentBattery = Mathf.Clamp(currentBattery + amount, 0, maxBattery);
         batterySlider.value = currentBattery;
+    }
+
+    private void LoadNextLevel()
+    {
+        // 加载下一关卡，这里可以通过名字或索引加载
+        UnityEngine.SceneManagement.SceneManager.LoadScene("EndScene");  // 将 "NextLevelSceneName" 替换为您实际的下一关的场景名
     }
 }
