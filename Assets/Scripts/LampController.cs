@@ -1,76 +1,152 @@
 ﻿using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;  // 需要引入此命名空间以使用场景管理
+using UnityEngine.SceneManagement;
 
 public class LampController : MonoBehaviour
 {
-    public UnityEngine.Rendering.Universal.Light2D lampLight;  // Light2D 组件的引用
-    public float maxIntensity = 5f;  // 灯光的最大强度
-    public float minIntensity = 0f;  // 灯光的最小强度
-    public float maxRange = 5f;  // 灯光的最大范围
-    public float minRange = 0f;  // 灯光的最小范围
-    public float intensityIncreaseRate = 1f;  // 强度增加的速率
-    public float rangeIncreaseRate = 1f;  // 范围增加的速率
-    public float smoothTime = 0.5f;  // 用于平滑减少强度和范围的时间
-    public float rotationSmoothTime = 0.1f;  // 灯光旋转的平滑时间
-    public float batteryConsumptionRate = 10f;  // 电池消耗速率
-    public float maxBattery = 100f;  // 最大电池电量
-    public Slider batterySlider;  // 电池滑动条的引用
-    public float batteryIncreaseAmount = 20f;  // 电池增加的量
+    public UnityEngine.Rendering.Universal.Light2D lampLight;
+    public float maxIntensity = 5f;
+    public float minIntensity = 0f;
+    public float maxRange = 5f;
+    public float minRange = 0f;
+    public float intensityIncreaseRate = 1f;
+    public float rangeIncreaseRate = 1f;
+    public float smoothTime = 0.5f;
+    public float rotationSmoothTime = 0.1f;
+    public float batteryConsumptionRate = 10f;
+    public float maxBattery = 100f;
+    public Slider batterySlider;
 
-    private float currentIntensity;  // 当前强度
-    public float currentRange;  // 当前范围
-    private float currentBattery;  // 当前电池电量
-    private float intensityVelocity = 0f;  // 强度平滑的速度
-    private float rangeVelocity = 0f;  // 范围平滑的速度
-    private Vector3 currentVelocity = Vector3.zero;  // 旋转平滑的速度
+    public float batteryIncreaseAmount = 20f;
+    public float laserInnerAngle = 0f;
+    public float laserOuterAngle = 8f;
+    public float angleSmoothTime = 0.2f;
+
+    public float CurrentRange { get; private set; }
+    public float CurrentBattery { get; private set; }
+
+    private float currentIntensity;
+    private float currentRange;
+    private float currentBattery;
+    private float intensityVelocity = 0f;
+    private float rangeVelocity = 0f;
+    private float innerAngleVelocity = 0f;
+    private float outerAngleVelocity = 0f;
+    private Vector3 currentVelocity = Vector3.zero;
+
+    private float initialInnerAngle;
+    private float initialOuterAngle;
 
     void Start()
     {
-        currentBattery = maxBattery;  // 将电池电量初始化为最大值
-        batterySlider.maxValue = maxBattery;  // 设置滑动条的最大值
-        batterySlider.value = currentBattery;  // 初始化滑动条的值
+        currentBattery = maxBattery;
+        batterySlider.maxValue = maxBattery;
+        batterySlider.value = currentBattery;
+
+        initialInnerAngle = lampLight.pointLightInnerAngle;
+        initialOuterAngle = lampLight.pointLightOuterAngle;
     }
 
     void Update()
     {
-        if (Input.GetMouseButton(0))  // 按住左键时
+        // 首先更新灯光方向，以确保灯光指向鼠标
+        UpdateLightDirection();
+
+        // 然后处理灯光的控制逻辑，包括强度、范围和电池消耗
+        HandleLightControl();
+
+        // 最后处理激光模式和射线检测
+        if (Input.GetMouseButton(1) || Input.GetKey(KeyCode.Space))
         {
-            // 增加灯光的强度和范围
+            EnterLaserMode();
+            HandleLaserRaycast();
+        }
+        else
+        {
+            ExitLaserMode();
+        }
+
+        // 检查电池状态
+        if (batterySlider.value <= 0)
+        {
+            LoadNextLevel();
+        }
+    }
+
+    void UpdateLightDirection()
+    {
+        // 计算鼠标位置和方向
+        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 direction = mousePosition - transform.position;
+
+        // 计算目标角度并进行平滑旋转
+        float targetAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        float smoothedAngle = Mathf.SmoothDampAngle(transform.eulerAngles.z, targetAngle, ref currentVelocity.z, rotationSmoothTime);
+        transform.rotation = Quaternion.Euler(0, 0, smoothedAngle);
+    }
+
+    void HandleLightControl()
+    {
+        // 控制灯光的强度和范围
+        if (Input.GetMouseButton(0))
+        {
             currentIntensity = Mathf.Clamp(currentIntensity + intensityIncreaseRate * Time.deltaTime, minIntensity, maxIntensity);
             currentRange = Mathf.Clamp(currentRange + rangeIncreaseRate * Time.deltaTime, minRange, maxRange);
 
-            // 根据强度计算电池消耗
             float batteryConsumption = batteryConsumptionRate * currentIntensity * Time.deltaTime;
             currentBattery = Mathf.Clamp(currentBattery - batteryConsumption, 0, maxBattery);
 
-            // 更新电池滑动条
             batterySlider.value = currentBattery;
         }
         else
         {
-            // 当鼠标没有按下时，平滑地减少灯光强度和范围
             currentIntensity = Mathf.SmoothDamp(currentIntensity, minIntensity, ref intensityVelocity, smoothTime);
             currentRange = Mathf.SmoothDamp(currentRange, minRange, ref rangeVelocity, smoothTime);
         }
 
-        // 应用灯光的强度和范围
         lampLight.intensity = currentIntensity;
         lampLight.pointLightOuterRadius = currentRange;
+    }
 
-        // 控制灯光方向
-        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector2 direction = mousePosition - transform.position;
-        float targetAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+    void EnterLaserMode()
+    {
+        // 进入激光模式，调整灯光角度
+        lampLight.pointLightInnerAngle = Mathf.SmoothDamp(lampLight.pointLightInnerAngle, laserInnerAngle, ref innerAngleVelocity, angleSmoothTime);
+        lampLight.pointLightOuterAngle = Mathf.SmoothDamp(lampLight.pointLightOuterAngle, laserOuterAngle, ref outerAngleVelocity, angleSmoothTime);
+    }
 
-        // 平滑旋转灯光
-        float smoothedAngle = Mathf.SmoothDampAngle(transform.eulerAngles.z, targetAngle - 90, ref currentVelocity.z, rotationSmoothTime);
-        transform.rotation = Quaternion.Euler(0, 0, smoothedAngle);
+    void ExitLaserMode()
+    {
+        // 退出激光模式，恢复灯光角度
+        lampLight.pointLightInnerAngle = Mathf.SmoothDamp(lampLight.pointLightInnerAngle, initialInnerAngle, ref innerAngleVelocity, angleSmoothTime);
+        lampLight.pointLightOuterAngle = Mathf.SmoothDamp(lampLight.pointLightOuterAngle, initialOuterAngle, ref outerAngleVelocity, angleSmoothTime);
+    }
 
-        // 检测电池电量是否为 0
-        if (batterySlider.value <= 0)
+    void HandleLaserRaycast()
+    {
+        // 射线检测逻辑
+        Vector2 raycastOrigin = lampLight.transform.position;
+        Vector2 raycastDirection = lampLight.transform.up; // 使用灯光的up方向
+
+        LayerMask beetleLayer = LayerMask.GetMask("BeetleLayer");
+
+        RaycastHit2D hit = Physics2D.Raycast(raycastOrigin, raycastDirection, Mathf.Infinity, beetleLayer);
+
+        if (hit.collider != null)
         {
-            LoadNextLevel();
+            Beetle beetle = hit.collider.GetComponent<Beetle>();
+
+            if (beetle != null)
+            {
+                beetle.IncreaseLaserExposure(Time.deltaTime);
+
+                if (beetle.IsExposedToLaser(0.2f)) // 检查曝光时间是否超过阈值
+                {
+                    beetle.DestroyBeetle(true);
+                    IncreaseBattery(batteryIncreaseAmount); // 增加电池
+                }
+            }
         }
     }
 
@@ -79,12 +155,10 @@ public class LampController : MonoBehaviour
         currentBattery = Mathf.Clamp(currentBattery - amount, 0, maxBattery);
         batterySlider.value = currentBattery;
 
-        // 处理电池耗尽逻辑
         if (currentBattery <= 0)
         {
-            // 例如，关闭灯光
             lampLight.enabled = false;
-            LoadNextLevel();  // 电池耗尽时也可以调用加载下一关
+            LoadNextLevel();
         }
     }
 
@@ -96,7 +170,6 @@ public class LampController : MonoBehaviour
 
     private void LoadNextLevel()
     {
-        // 加载下一关卡，这里可以通过名字或索引加载
-        UnityEngine.SceneManagement.SceneManager.LoadScene("EndScene");  // 将 "NextLevelSceneName" 替换为您实际的下一关的场景名
+        SceneManager.LoadScene("EndScene");
     }
 }

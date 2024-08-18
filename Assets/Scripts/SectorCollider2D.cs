@@ -9,25 +9,39 @@ public class SectorCollider2D : MonoBehaviour
     [SerializeField] public Vector2 direction; // 扇形的朝向
 
     private PolygonCollider2D polygonCollider;
+    private LampController lampController;
 
     void Start()
     {
         segmentCount = 10;
         angle = 60f;
         direction = Vector2.up;
-        radius = 0.8f * Mathf.Max(transform.parent.GetComponent<LampController>().currentRange - 1f, 0);
-        polygonCollider = GetComponent<PolygonCollider2D>();
-        UpdateCollider();
+        lampController = GetComponentInParent<LampController>();
+        if (lampController == null)
+        {
+            Debug.LogError("LampController not found on parent object.");
+        }
+        else
+        {
+            radius = 0.8f * Mathf.Max(lampController.CurrentRange - 1f, 0);
+            polygonCollider = GetComponent<PolygonCollider2D>();
+            UpdateCollider();
+        }
     }
 
     void Update()
     {
-        UpdateCollider();
+        if (lampController != null)
+        {
+            radius = 0.8f * Mathf.Max(lampController.CurrentRange - 1f, 0);
+            UpdateCollider();
+        }
     }
 
     void UpdateCollider()
     {
-        radius = 0.8f * Mathf.Max(transform.parent.GetComponent<LampController>().currentRange - 1f, 0);
+        if (lampController == null) return;
+
         // 扇形顶点数量 = 分段数 + 2（扇形圆心和末端点）
         Vector2[] points = new Vector2[segmentCount + 2];
         points[0] = Vector2.zero; // 圆心
