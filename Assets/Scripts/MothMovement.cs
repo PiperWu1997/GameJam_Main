@@ -75,7 +75,7 @@ public class MothMovement : FlyMovement
         }
 
         float floatOffset = Mathf.Sin(Time.time * floatSpeed) * floatAmplitude;
-        transform.localScale = new Vector3(0.3f, 0.3f + 0.3f * floatOffset, 0.3f);
+        scaleGameObject.localScale = new Vector3(1f, 1f + 1f * floatOffset, 1f);
     }
 
     bool IsOutOfBounds(Vector3 position)
@@ -92,6 +92,12 @@ public class MothMovement : FlyMovement
         if (other.CompareTag("LampLight"))
         {
             isFlyingToTarget = true;
+        }
+        
+        if (!gameManager.hasMothInstructionShownOnceInScene)
+        {
+            instructor.ShowInstructions();
+            gameManager.hasMothInstructionShownOnceInScene = true;
         }
     }
 

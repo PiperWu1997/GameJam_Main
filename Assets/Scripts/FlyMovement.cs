@@ -22,12 +22,17 @@ public class FlyMovement : MonoBehaviour
 
     protected LampController lampController; // Reference to the LampController script
     private ScoreManager scoreManager; // Reference to the ScoreManager script
+    protected GameManager gameManager;
+    protected Instructor instructor;
+    protected Transform scaleGameObject;
+
 
     protected virtual void Start()
     {
         originPosition = transform.position;
         targetPosition = originPosition;
         slowSpeed = speed * 0.5f;
+        instructor = GetComponent<Instructor>();
 
         // Find the LampController component in the scene
         lampController = FindObjectOfType<LampController>();
@@ -41,6 +46,21 @@ public class FlyMovement : MonoBehaviour
         if (scoreManager == null)
         {
             Debug.LogError("ScoreManager not found in the scene.");
+        }
+
+        gameManager = FindObjectOfType<GameManager>();
+        if (gameManager == null)
+        {
+            Debug.LogError("GameManager not found in the scene.");
+        }
+
+        foreach (Transform child in transform)
+        {
+            // 检查子物体的名称是否包含 "scale"
+            if (child.name.Contains("scale"))
+            {
+                scaleGameObject = child;
+            }
         }
     }
 
@@ -56,10 +76,12 @@ public class FlyMovement : MonoBehaviour
                 {
                     lampController.IncreaseBattery(5f); // Increase battery by a specified amount
                 }
+
                 if (scoreManager != null)
                 {
                     scoreManager.AddScore(scoreValue); // Add score
                 }
+
                 Destroy(gameObject); // Destroy the fly object
             }
         }
@@ -92,6 +114,12 @@ public class FlyMovement : MonoBehaviour
         if (other.CompareTag("LampLight"))
         {
             isFlyingToTarget = true;
+        }
+
+        if (!gameManager.hasFlyInstructionShownOnceInScene)
+        {
+            instructor.ShowInstructions();
+            gameManager.hasFlyInstructionShownOnceInScene = true;
         }
     }
 
