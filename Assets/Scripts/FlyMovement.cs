@@ -24,6 +24,7 @@ public class FlyMovement : MonoBehaviour
     private ScoreManager scoreManager; // Reference to the ScoreManager script
     protected GameManager gameManager;
     protected Instructor instructor;
+    protected Transform scaleGameObject;
 
 
     protected virtual void Start()
@@ -51,6 +52,15 @@ public class FlyMovement : MonoBehaviour
         if (gameManager == null)
         {
             Debug.LogError("GameManager not found in the scene.");
+        }
+
+        foreach (Transform child in transform)
+        {
+            // 检查子物体的名称是否包含 "scale"
+            if (child.name.Contains("scale"))
+            {
+                scaleGameObject = child;
+            }
         }
     }
 
