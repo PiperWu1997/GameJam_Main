@@ -27,7 +27,7 @@ public class LampController : MonoBehaviour
     public float CurrentBattery { get; private set; }
 
     private float currentIntensity;
-    private float currentRange;
+    [SerializeField]
     private float currentBattery;
     private float intensityVelocity = 0f;
     private float rangeVelocity = 0f;
@@ -37,6 +37,11 @@ public class LampController : MonoBehaviour
 
     private float initialInnerAngle;
     private float initialOuterAngle;
+
+    private bool isWaitingForFlashLightSecondClick = false;
+    private float flashLightTimer = 0.0f;
+    private float flashLightTimeWindow = 0.5f; // 0.5秒的时间窗口
+    private bool flashLightSkillReleased = false;
 
     void Start()
     {
@@ -72,6 +77,7 @@ public class LampController : MonoBehaviour
         {
             LoadNextLevel();
         }
+        Debug.Log(CurrentRange);
     }
 
     void UpdateLightDirection()
@@ -82,7 +88,7 @@ public class LampController : MonoBehaviour
 
         // 计算目标角度并进行平滑旋转
         float targetAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        float smoothedAngle = Mathf.SmoothDampAngle(transform.eulerAngles.z, targetAngle, ref currentVelocity.z, rotationSmoothTime);
+        float smoothedAngle = Mathf.SmoothDampAngle(transform.eulerAngles.z, targetAngle - 90, ref currentVelocity.z, rotationSmoothTime);
         transform.rotation = Quaternion.Euler(0, 0, smoothedAngle);
     }
 
@@ -92,7 +98,7 @@ public class LampController : MonoBehaviour
         if (Input.GetMouseButton(0))
         {
             currentIntensity = Mathf.Clamp(currentIntensity + intensityIncreaseRate * Time.deltaTime, minIntensity, maxIntensity);
-            currentRange = Mathf.Clamp(currentRange + rangeIncreaseRate * Time.deltaTime, minRange, maxRange);
+            CurrentRange = Mathf.Clamp(CurrentRange + rangeIncreaseRate * Time.deltaTime, minRange, maxRange);
 
             float batteryConsumption = batteryConsumptionRate * currentIntensity * Time.deltaTime;
             currentBattery = Mathf.Clamp(currentBattery - batteryConsumption, 0, maxBattery);
@@ -102,11 +108,11 @@ public class LampController : MonoBehaviour
         else
         {
             currentIntensity = Mathf.SmoothDamp(currentIntensity, minIntensity, ref intensityVelocity, smoothTime);
-            currentRange = Mathf.SmoothDamp(currentRange, minRange, ref rangeVelocity, smoothTime);
+            CurrentRange = Mathf.SmoothDamp(CurrentRange, minRange, ref rangeVelocity, smoothTime);
         }
 
         lampLight.intensity = currentIntensity;
-        lampLight.pointLightOuterRadius = currentRange;
+        lampLight.pointLightOuterRadius = CurrentRange;
     }
 
     void EnterLaserMode()
