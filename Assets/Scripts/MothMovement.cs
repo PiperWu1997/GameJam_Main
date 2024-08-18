@@ -93,6 +93,12 @@ public class MothMovement : FlyMovement
         {
             isFlyingToTarget = true;
         }
+        
+        if (!gameManager.hasMothInstructionShownOnceInScene)
+        {
+            instructor.ShowInstructions();
+            gameManager.hasMothInstructionShownOnceInScene = true;
+        }
     }
 
     void OnTriggerExit2D(Collider2D other)
