@@ -34,6 +34,7 @@ public class SectorCollider2D : MonoBehaviour
         if (lampController != null)
         {
             radius = 0.8f * Mathf.Max(lampController.CurrentRange - 1f, 0);
+            angle = 0.8f * Mathf.Max(lampController.lampLight.pointLightInnerAngle, 0);
             UpdateCollider();
         }
     }
