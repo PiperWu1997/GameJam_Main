@@ -31,21 +31,5 @@ public class MySceneManager : MonoBehaviour
     {
         // Load the MainScene and reset the score
         SceneManager.LoadScene("MainScene");
-        // Ensure ScoreManager is properly reset
-        ResetScore();
-    }
-
-    void ResetScore()
-    {
-        // Ensure the ScoreManager is available and reset its score
-        ScoreManager scoreManager = ScoreManager.instance;
-        if (scoreManager != null)
-        {
-            scoreManager.ResetScore(); // Reset the score
-        }
-        else
-        {
-            Debug.LogError("ScoreManager instance is not available.");
-        }
     }
 }

@@ -9,8 +9,8 @@ public class Instructor : MonoBehaviour
 
     public void ShowInstructions()
     {
-        Time.timeScale = 0;
-        StartCoroutine(ShowInstructionsCoroutine());
+        // Time.timeScale = 0;
+        // StartCoroutine(ShowInstructionsCoroutine());
     }
 
     public IEnumerator ShowInstructionsCoroutine()
