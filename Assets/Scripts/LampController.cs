@@ -45,12 +45,20 @@ public class LampController : MonoBehaviour
     private bool flashLightSkillReleased;
     private PolygonCollider2D detectorCollider2D;
     private SectorCollider2D sectorCollider2D;
+    private ScoreManager scoreManager; // Reference to the ScoreManager script
 
     public int flashCount; // 闪烁次数
     public float flashDuration; // 每次闪烁的持续时间
 
     void Start()
     {
+        // Find the ScoreManager component in the scene
+        scoreManager = FindObjectOfType<ScoreManager>();
+        if (scoreManager == null)
+        {
+            Debug.LogError("ScoreManager not found in the scene.");
+        }
+        
         flashCount = 4;
         flashDuration = 0.1f;
         flashLightTimer = 0f;
@@ -152,6 +160,7 @@ public class LampController : MonoBehaviour
         {
             StartCoroutine(PlayAnimationAndDestroy(bug));
             Debug.Log($"Bug {bug} Destroyed!");
+            scoreManager.AddScore(bug.GetComponent<PhantomBugMovement>().scoreWhenDestroyed);
         }
     }
     private IEnumerator PlayAnimationAndDestroy(GameObject bug)

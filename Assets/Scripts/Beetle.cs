@@ -5,7 +5,9 @@ public class Beetle : MonoBehaviour
     public float laserExposureTime = 0f;  // 当前暴露在激光下的时间
     public float requiredExposureTime = 1f;  // 需要暴露在激光下的时间
     public GameObject destructionParticlePrefab;  // 粒子效果的 prefab
+    private ScoreManager scoreManager; // Reference to the ScoreManager script
 
+    public int scoreWhenDestroyed = 5;
     private LampController lampController;  // 引用 LampController 脚本
 
     private bool isLaserMode = false;  // 是否处于激光模式
@@ -13,6 +15,12 @@ public class Beetle : MonoBehaviour
     void Start()
     {
         lampController = FindObjectOfType<LampController>();  // 获取 LampController 实例
+        // Find the ScoreManager component in the scene
+        scoreManager = FindObjectOfType<ScoreManager>();
+        if (scoreManager == null)
+        {
+            Debug.LogError("ScoreManager not found in the scene.");
+        }
     }
 
     void Update()
@@ -51,6 +59,7 @@ public class Beetle : MonoBehaviour
             }
 
             lampController.IncreaseBattery(5f);  // 增加 lamp 电池
+            scoreManager.AddScore(scoreWhenDestroyed);
         }
         else
         {

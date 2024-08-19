@@ -394,9 +394,9 @@ CircleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.0024724007, y: 0}
   serializedVersion: 2
-  m_Radius: 1
+  m_Radius: 0.5128741
 --- !u!114 &-2568395042780104266
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -458,6 +458,8 @@ MonoBehaviour:
   scoreValue: 5
   fixedTargetPosition: {x: 0, y: 0}
   destroyRadius: 0.5
+  scoreWhenDestroyed: 5
+  batteryDecreasedWhenHitLamp: 5
 --- !u!95 &9136909052678166333
 Animator:
   serializedVersion: 5

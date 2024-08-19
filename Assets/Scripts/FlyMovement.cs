@@ -70,7 +70,7 @@ public class FlyMovement : MonoBehaviour
         {
             transform.position = Vector2.MoveTowards(transform.position, fixedTargetPosition, Time.deltaTime * slowSpeed);
 
-            if (Vector2.Distance(transform.position, fixedTargetPosition) <= destroyRadius)
+            if (!gameObject.name.Contains("Phantom") && Vector2.Distance(transform.position, fixedTargetPosition) <= destroyRadius)
             {
                 if (lampController != null)
                 {
