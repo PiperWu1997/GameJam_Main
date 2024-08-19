@@ -50,6 +50,14 @@ public class LampController : MonoBehaviour
     public int flashCount; // 闪烁次数
     public float flashDuration; // 每次闪烁的持续时间
 
+    public AudioSource lampAudioSource;  // Reference to the AudioSource component
+    public AudioClip lampAudioClip;  // Reference to the AudioClip to be played
+    public AudioClip clickAudioClip;  // Reference to the AudioClip for clicking
+    public float maxVolume = 1.0f;  // Maximum volume level
+    public float minVolume = 0f;  // Minimum volume level
+    public float volumeIncreaseRate = 0.5f;  // Volume increase rate when the button is held
+    public float volumeDecreaseRate = 1.0f;  // Volume decrease rate when the button is released
+
     void Start()
     {
         // Find the ScoreManager component in the scene
@@ -58,7 +66,14 @@ public class LampController : MonoBehaviour
         {
             Debug.LogError("ScoreManager not found in the scene.");
         }
-        
+
+        if (lampAudioSource != null && lampAudioClip != null)
+        {
+            lampAudioSource.clip = lampAudioClip;
+            lampAudioSource.loop = true;  // Ensure the audio loops
+            lampAudioSource.volume = 0f;  // Start with volume at 0
+        }
+
         flashCount = 4;
         flashDuration = 0.1f;
         flashLightTimer = 0f;
@@ -100,6 +115,12 @@ public class LampController : MonoBehaviour
         if (batterySlider.value <= 0)
         {
             LoadNextLevel();
+        }
+
+        // Play click sound when the left mouse button is clicked
+        if (Input.GetMouseButtonDown(0))
+        {
+            PlayClickSound();
         }
     }
 
@@ -165,7 +186,7 @@ public class LampController : MonoBehaviour
     }
     private IEnumerator PlayAnimationAndDestroy(GameObject bug)
     {
-        Animator animator= bug.GetComponent<Animator>();
+        Animator animator = bug.GetComponent<Animator>();
         animator.enabled = true;
         // 播放动画
         animator.Play("Burning");
@@ -194,8 +215,7 @@ public class LampController : MonoBehaviour
 
     void HandleLightControl()
     {
-        // 控制灯光的强度和范围
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0))  // Light is on
         {
             currentIntensity = Mathf.Clamp(currentIntensity + intensityIncreaseRate * Time.deltaTime, minIntensity, maxIntensity);
             CurrentRange = Mathf.Clamp(CurrentRange + rangeIncreaseRate * Time.deltaTime, minRange, maxRange);
@@ -204,15 +224,44 @@ public class LampController : MonoBehaviour
             currentBattery = Mathf.Clamp(currentBattery - batteryConsumption, 0, maxBattery);
 
             batterySlider.value = currentBattery;
+
+            // Play audio if it's not already playing
+            if (!lampAudioSource.isPlaying)
+            {
+                lampAudioSource.Play();
+            }
+
+            // Adjust volume based on current intensity
+            lampAudioSource.volume = Mathf.Lerp(minVolume, maxVolume, currentIntensity / maxIntensity);
         }
-        else
+        else  // Light is off
         {
             currentIntensity = Mathf.SmoothDamp(currentIntensity, minIntensity, ref intensityVelocity, smoothTime);
             CurrentRange = Mathf.SmoothDamp(CurrentRange, minRange, ref rangeVelocity, smoothTime);
+
+            // Adjust volume down as the light dims
+            if (lampAudioSource.isPlaying)
+            {
+                lampAudioSource.volume = Mathf.Lerp(minVolume, maxVolume, currentIntensity / maxIntensity);
+
+                // Stop the audio when the light is fully off
+                if (currentIntensity <= minIntensity)
+                {
+                    lampAudioSource.Stop();
+                }
+            }
         }
 
         lampLight.intensity = currentIntensity;
         lampLight.pointLightOuterRadius = CurrentRange;
+    }
+
+    private void PlayClickSound()
+    {
+        if (clickAudioClip != null && lampAudioSource != null)
+        {
+            lampAudioSource.PlayOneShot(clickAudioClip);
+        }
     }
 
     void EnterLaserMode()
