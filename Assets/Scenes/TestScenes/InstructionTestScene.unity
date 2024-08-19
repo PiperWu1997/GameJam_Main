@@ -246,6 +246,9 @@ MonoBehaviour:
   laserInnerAngle: 0
   laserOuterAngle: 8
   angleSmoothTime: 0.2
+  currentBattery: 0
+  flashCount: 5
+  flashDuration: 0.1
 --- !u!114 &68032896
 MonoBehaviour:
   m_ObjectHideFlags: 0

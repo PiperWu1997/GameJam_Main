@@ -415,6 +415,6 @@ MonoBehaviour:
   moveRadius: 0.8
   floatAmplitude: 0.1
   floatSpeed: 3
-  scoreValue: 1
+  scoreValue: 5
   fixedTargetPosition: {x: 0, y: 0}
   destroyRadius: 0.5
