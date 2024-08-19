@@ -8,7 +8,7 @@ public class Spawner : MonoBehaviour
     public GameObject phantomPrefab;
     public Transform lamp;
     public float spawnRadius = 0.5f;
-    public float spawnInterval = 1f; // Time between spawns
+    public float spawnInterval = 5f; // Time between spawns
     public float minPrefabsInScene = 3f; // Minimum number of prefabs in the scene initially
     public float midPrefabsInScene = 10f; // Number of prefabs between 10s and 30s
     public float maxPrefabsInScene = 15f; // Maximum number of prefabs after 30s
@@ -63,6 +63,7 @@ public class Spawner : MonoBehaviour
     void SpawnPrefab()
     {
         GameObject prefab =new []{ flyPrefab, mothPrefab, phantomPrefab }[Random.Range(0, 3)] ;
+        // GameObject prefab =phantomPrefab;
 
         Vector3 spawnPosition;
         do

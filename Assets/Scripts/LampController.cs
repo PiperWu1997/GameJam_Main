@@ -150,11 +150,27 @@ public class LampController : MonoBehaviour
         detectorCollider2D.enabled = true;
         foreach (var bug in sectorCollider2D.GetObjectsInTrigger())
         {
-            Destroy(bug);
+            StartCoroutine(PlayAnimationAndDestroy(bug));
             Debug.Log($"Bug {bug} Destroyed!");
         }
     }
+    private IEnumerator PlayAnimationAndDestroy(GameObject bug)
+    {
+        Animator animator= bug.GetComponent<Animator>();
+        animator.enabled = true;
+        // 播放动画
+        animator.Play("Burning");
 
+        // 获取动画片段的时长
+        AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+        float animationLength = stateInfo.length;
+
+        // 等待动画播放完毕
+        yield return new WaitForSeconds(animationLength);
+
+        // 销毁物体
+        Destroy(bug);
+    }
     void UpdateLightDirection()
     {
         // 计算鼠标位置和方向
