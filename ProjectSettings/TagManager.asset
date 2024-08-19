@@ -6,11 +6,13 @@ TagManager:
   tags:
   - LampLight
   - FlyCollider
+  - Lamp
+  - Beetle
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - BeetleLayer
   - Water
   - UI
   - 

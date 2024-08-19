@@ -10,7 +10,7 @@ public class BeetleMovement : MonoBehaviour
     public float destroyRadius = 0.5f; // Radius to detect if near the center
 
     private Vector2 targetPosition; // The target position to fly towards
-    private Vector2 originPosition;
+    private Vector2 startPosition; // Initial position off-screen
     private LampController lampController; // Reference to the LampController script
 
     private float exposureTime = 0f; // Time the beetle has been exposed to the laser
@@ -23,18 +23,25 @@ public class BeetleMovement : MonoBehaviour
         if (lampController == null)
         {
             Debug.LogError("LampController not found in the scene.");
+            return;
         }
+
+        // Initialize startPosition off-screen
+        // This will set the beetle to start outside the screen on a random position
+        float startX = Random.Range(-10f, 10f);
+        float startY = Random.Range(-10f, 10f);
+        startPosition = new Vector2(startX, startY);
+        transform.position = startPosition;
 
         // Set the target position to the lamp's position
         targetPosition = lampController.transform.position;
-        originPosition = transform.position;
     }
 
     void Update()
     {
         // Move the beetle in a zigzag pattern toward the lamp
         float zigzagOffset = Mathf.Sin(Time.time * zigzagFrequency) * zigzagAmplitude;
-        Vector2 direction = (targetPosition - originPosition).normalized;
+        Vector2 direction = (targetPosition - (Vector2)transform.position).normalized;
         Vector2 zigzagDirection = direction + new Vector2(-direction.y, direction.x) * zigzagOffset;
 
         transform.position = Vector2.MoveTowards(transform.position, (Vector2)transform.position + zigzagDirection, Time.deltaTime * speed);

@@ -23,12 +23,13 @@ public class LampController : MonoBehaviour
     public float laserOuterAngle = 8f;
     public float angleSmoothTime = 0.2f;
 
+    public LayerMask beetleLayer; // Layer mask for beetles
+    public GameObject destructionParticlePrefab; // Assign the Particle System prefab here
+
     public float CurrentRange { get; private set; }
     public float CurrentBattery { get; private set; }
 
     private float currentIntensity;
-    private float currentRange;
-    private float currentBattery;
     private float intensityVelocity = 0f;
     private float rangeVelocity = 0f;
     private float innerAngleVelocity = 0f;
@@ -40,9 +41,9 @@ public class LampController : MonoBehaviour
 
     void Start()
     {
-        currentBattery = maxBattery;
+        CurrentBattery = maxBattery;
         batterySlider.maxValue = maxBattery;
-        batterySlider.value = currentBattery;
+        batterySlider.value = CurrentBattery;
 
         initialInnerAngle = lampLight.pointLightInnerAngle;
         initialOuterAngle = lampLight.pointLightOuterAngle;
@@ -50,13 +51,9 @@ public class LampController : MonoBehaviour
 
     void Update()
     {
-        // 首先更新灯光方向，以确保灯光指向鼠标
         UpdateLightDirection();
-
-        // 然后处理灯光的控制逻辑，包括强度、范围和电池消耗
         HandleLightControl();
 
-        // 最后处理激光模式和射线检测
         if (Input.GetMouseButton(1) || Input.GetKey(KeyCode.Space))
         {
             EnterLaserMode();
@@ -67,7 +64,6 @@ public class LampController : MonoBehaviour
             ExitLaserMode();
         }
 
-        // 检查电池状态
         if (batterySlider.value <= 0)
         {
             LoadNextLevel();
@@ -76,60 +72,52 @@ public class LampController : MonoBehaviour
 
     void UpdateLightDirection()
     {
-        // 计算鼠标位置和方向
         Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 direction = mousePosition - transform.position;
 
-        // 计算目标角度并进行平滑旋转
         float targetAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        float smoothedAngle = Mathf.SmoothDampAngle(transform.eulerAngles.z, targetAngle, ref currentVelocity.z, rotationSmoothTime);
+        float smoothedAngle = Mathf.SmoothDampAngle(transform.eulerAngles.z, targetAngle - 90, ref currentVelocity.z, rotationSmoothTime);
         transform.rotation = Quaternion.Euler(0, 0, smoothedAngle);
     }
 
     void HandleLightControl()
     {
-        // 控制灯光的强度和范围
         if (Input.GetMouseButton(0))
         {
             currentIntensity = Mathf.Clamp(currentIntensity + intensityIncreaseRate * Time.deltaTime, minIntensity, maxIntensity);
-            currentRange = Mathf.Clamp(currentRange + rangeIncreaseRate * Time.deltaTime, minRange, maxRange);
+            CurrentRange = Mathf.Clamp(CurrentRange + rangeIncreaseRate * Time.deltaTime, minRange, maxRange);
 
             float batteryConsumption = batteryConsumptionRate * currentIntensity * Time.deltaTime;
-            currentBattery = Mathf.Clamp(currentBattery - batteryConsumption, 0, maxBattery);
+            CurrentBattery = Mathf.Clamp(CurrentBattery - batteryConsumption, 0, maxBattery);
 
-            batterySlider.value = currentBattery;
+            batterySlider.value = CurrentBattery;
         }
         else
         {
             currentIntensity = Mathf.SmoothDamp(currentIntensity, minIntensity, ref intensityVelocity, smoothTime);
-            currentRange = Mathf.SmoothDamp(currentRange, minRange, ref rangeVelocity, smoothTime);
+            CurrentRange = Mathf.SmoothDamp(CurrentRange, minRange, ref rangeVelocity, smoothTime);
         }
 
         lampLight.intensity = currentIntensity;
-        lampLight.pointLightOuterRadius = currentRange;
+        lampLight.pointLightOuterRadius = CurrentRange;
     }
 
     void EnterLaserMode()
     {
-        // 进入激光模式，调整灯光角度
         lampLight.pointLightInnerAngle = Mathf.SmoothDamp(lampLight.pointLightInnerAngle, laserInnerAngle, ref innerAngleVelocity, angleSmoothTime);
         lampLight.pointLightOuterAngle = Mathf.SmoothDamp(lampLight.pointLightOuterAngle, laserOuterAngle, ref outerAngleVelocity, angleSmoothTime);
     }
 
     void ExitLaserMode()
     {
-        // 退出激光模式，恢复灯光角度
         lampLight.pointLightInnerAngle = Mathf.SmoothDamp(lampLight.pointLightInnerAngle, initialInnerAngle, ref innerAngleVelocity, angleSmoothTime);
         lampLight.pointLightOuterAngle = Mathf.SmoothDamp(lampLight.pointLightOuterAngle, initialOuterAngle, ref outerAngleVelocity, angleSmoothTime);
     }
 
     void HandleLaserRaycast()
     {
-        // 射线检测逻辑
         Vector2 raycastOrigin = lampLight.transform.position;
-        Vector2 raycastDirection = lampLight.transform.up; // 使用灯光的up方向
-
-        LayerMask beetleLayer = LayerMask.GetMask("BeetleLayer");
+        Vector2 raycastDirection = lampLight.transform.up; // Use the light's up direction
 
         RaycastHit2D hit = Physics2D.Raycast(raycastOrigin, raycastDirection, Mathf.Infinity, beetleLayer);
 
@@ -141,10 +129,16 @@ public class LampController : MonoBehaviour
             {
                 beetle.IncreaseLaserExposure(Time.deltaTime);
 
-                if (beetle.IsExposedToLaser(0.2f)) // 检查曝光时间是否超过阈值
+                if (beetle.IsExposedToLaser(1f)) // Check if exposure time exceeds the threshold
                 {
                     beetle.DestroyBeetle(true);
-                    IncreaseBattery(batteryIncreaseAmount); // 增加电池
+                    IncreaseBattery(batteryIncreaseAmount); // Increase battery
+
+                    // Instantiate particle effect at the beetle's position
+                    if (destructionParticlePrefab != null)
+                    {
+                        Instantiate(destructionParticlePrefab, beetle.transform.position, Quaternion.identity);
+                    }
                 }
             }
         }
@@ -152,10 +146,10 @@ public class LampController : MonoBehaviour
 
     public void DecreaseBattery(float amount)
     {
-        currentBattery = Mathf.Clamp(currentBattery - amount, 0, maxBattery);
-        batterySlider.value = currentBattery;
+        CurrentBattery = Mathf.Clamp(CurrentBattery - amount, 0, maxBattery);
+        batterySlider.value = CurrentBattery;
 
-        if (currentBattery <= 0)
+        if (CurrentBattery <= 0)
         {
             lampLight.enabled = false;
             LoadNextLevel();
@@ -164,8 +158,8 @@ public class LampController : MonoBehaviour
 
     public void IncreaseBattery(float amount)
     {
-        currentBattery = Mathf.Clamp(currentBattery + amount, 0, maxBattery);
-        batterySlider.value = currentBattery;
+        CurrentBattery = Mathf.Clamp(CurrentBattery + amount, 0, maxBattery);
+        batterySlider.value = CurrentBattery;
     }
 
     private void LoadNextLevel()
