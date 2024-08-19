@@ -1,16 +1,15 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI; // For using the Image component
 
 public class ScoreManager : MonoBehaviour
 {
     public static ScoreManager instance; // Singleton instance to access ScoreManager globally
     public TextMeshProUGUI scoreText; // Reference to the TextMeshProUGUI component for the current score
     public TextMeshProUGUI highScoreText; // Reference to the TextMeshProUGUI component for the high score
-    public SpriteRenderer newHighScoreSprite; // Reference to the SpriteRenderer component to display if a new high score is achieved
-    private int score = 0;
-    private int highScore;
+    public GameObject newHighScoreIndicator; // Reference to the GameObject that indicates a new high score
+    private int score = 0; // Current session score
+    private int highScore; // Persistent high score
 
     void Awake()
     {
@@ -30,13 +29,14 @@ public class ScoreManager : MonoBehaviour
     {
         // Load the high score from PlayerPrefs
         highScore = PlayerPrefs.GetInt("HighScore", 0);
+        ResetScore(); // Reset score when the game starts
         UpdateScoreText();
         UpdateHighScoreText();
 
-        // Ensure the sprite is initially hidden
-        if (newHighScoreSprite != null)
+        // Ensure the indicator is initially hidden
+        if (newHighScoreIndicator != null)
         {
-            newHighScoreSprite.gameObject.SetActive(false);
+            newHighScoreIndicator.SetActive(false);
         }
 
         // Subscribe to scene loading events
@@ -58,22 +58,28 @@ public class ScoreManager : MonoBehaviour
             PlayerPrefs.SetInt("HighScore", highScore);
             PlayerPrefs.Save();
 
-            // Display the new high score sprite
-            if (newHighScoreSprite != null)
+            // Activate the new high score indicator
+            if (newHighScoreIndicator != null)
             {
-                newHighScoreSprite.gameObject.SetActive(true);
+                newHighScoreIndicator.SetActive(true);
             }
         }
         else
         {
-            // Hide the new high score sprite if it's not a new high score
-            if (newHighScoreSprite != null)
+            // Hide the new high score indicator if it's not a new high score
+            if (newHighScoreIndicator != null)
             {
-                newHighScoreSprite.gameObject.SetActive(false);
+                newHighScoreIndicator.SetActive(false);
             }
         }
 
         UpdateHighScoreText();
+    }
+
+    void ResetScore()
+    {
+        score = 0; // Reset the current session score to 0
+        UpdateScoreText();
     }
 
     void UpdateScoreText()
@@ -103,16 +109,15 @@ public class ScoreManager : MonoBehaviour
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         // Dynamically find the scoreText and highScoreText in the new scene
-        if (scoreText == null)
+        scoreText = GameObject.Find("ScoreText")?.GetComponent<TextMeshProUGUI>();
+        highScoreText = GameObject.Find("HighScoreText")?.GetComponent<TextMeshProUGUI>();
+
+        // Reset score if returning to the game scene
+        if (scene.name == "MainScene")
         {
-            scoreText = GameObject.Find("ScoreText")?.GetComponent<TextMeshProUGUI>();
-        }
-        if (highScoreText == null)
-        {
-            highScoreText = GameObject.Find("HighScoreText")?.GetComponent<TextMeshProUGUI>();
+            ResetScore(); // Reset the score for a new game session
         }
 
-        // Update the score and high score text when a new scene is loaded
         UpdateScoreText();
         UpdateHighScoreText();
     }

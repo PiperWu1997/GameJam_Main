@@ -506,7 +506,7 @@ GameObject:
   - component: {fileID: 1075211024}
   - component: {fileID: 1075211023}
   m_Layer: 0
-  m_Name: number-one-first-place-winner-label
+  m_Name: newHighScoreIndicator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -610,7 +610,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scoreText: {fileID: 1585844564}
   highScoreText: {fileID: 1027740083}
-  newHighScoreSprite: {fileID: 1075211023}
+  newHighScoreIndicator: {fileID: 1075211022}
 --- !u!4 &1258839884
 Transform:
   m_ObjectHideFlags: 0
