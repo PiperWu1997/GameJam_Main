@@ -5,6 +5,7 @@ public class Spawner : MonoBehaviour
 {
     public GameObject flyPrefab;
     public GameObject mothPrefab;
+    public GameObject phantomPrefab;
     public Transform lamp;
     public float spawnRadius = 0.5f;
     public float spawnInterval = 1f; // Time between spawns
@@ -61,7 +62,7 @@ public class Spawner : MonoBehaviour
 
     void SpawnPrefab()
     {
-        GameObject prefab = Random.value > 0.5f ? flyPrefab : mothPrefab;
+        GameObject prefab =new []{ flyPrefab, mothPrefab, phantomPrefab }[Random.Range(0, 3)] ;
 
         Vector3 spawnPosition;
         do

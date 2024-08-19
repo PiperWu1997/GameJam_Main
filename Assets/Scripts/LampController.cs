@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -30,6 +32,7 @@ public class LampController : MonoBehaviour
     public float CurrentBattery { get; private set; }
 
     private float currentIntensity;
+    //[SerializeField] private float currentBattery;
     private float intensityVelocity = 0f;
     private float rangeVelocity = 0f;
     private float innerAngleVelocity = 0f;
@@ -39,21 +42,45 @@ public class LampController : MonoBehaviour
     private float initialInnerAngle;
     private float initialOuterAngle;
 
+    private bool isWaitingForFlashLightSecondClick;
+    private float flashLightTimer;
+    private float flashLightTimeWindow; // 0.5秒的时间窗口
+    private bool flashLightSkillReleased;
+    private PolygonCollider2D detectorCollider2D;
+    private SectorCollider2D sectorCollider2D;
+
+    public int flashCount ; // 闪烁次数
+    public float flashDuration; // 每次闪烁的持续时间
+
     void Start()
     {
         CurrentBattery = maxBattery;
+
+        flashCount = 4;
+        flashDuration = 0.1f;
+        flashLightTimer = 0f;
+        flashLightTimeWindow = 0.5f;
+        isWaitingForFlashLightSecondClick = false;
+        //currentBattery = maxBattery;
         batterySlider.maxValue = maxBattery;
         batterySlider.value = CurrentBattery;
+        flashLightSkillReleased = false;
 
         initialInnerAngle = lampLight.pointLightInnerAngle;
         initialOuterAngle = lampLight.pointLightOuterAngle;
+        detectorCollider2D = transform.Find("Detector").GetComponent<PolygonCollider2D>();
+        sectorCollider2D = transform.Find("Detector").GetComponent<SectorCollider2D>();
     }
 
     void Update()
     {
         UpdateLightDirection();
         HandleLightControl();
-
+        
+        // 处理闪光灯技能
+        HandleFlashLightSkill();
+        
+        // 最后处理激光模式和射线检测
         if (Input.GetMouseButton(1) || Input.GetKey(KeyCode.Space))
         {
             EnterLaserMode();
@@ -67,6 +94,66 @@ public class LampController : MonoBehaviour
         if (batterySlider.value <= 0)
         {
             LoadNextLevel();
+        }
+    }
+
+    private void HandleFlashLightSkill()
+    {
+        if (Input.GetMouseButtonUp(0))
+        {
+            if (!isWaitingForFlashLightSecondClick)
+            {
+                // 第一次松开左键，开始计时
+                isWaitingForFlashLightSecondClick = true;
+                flashLightSkillReleased = false;
+                flashLightTimer = 0.0f;
+            }
+            else if (!flashLightSkillReleased && flashLightTimer <= flashLightTimeWindow)
+            {
+                // 在0.5秒内再次点击左键，则释放技能
+                StartCoroutine(ReleaseFlashLightSkill());
+                flashLightSkillReleased = true;
+            }
+        }
+
+        // 计时器运行
+        if (isWaitingForFlashLightSecondClick)
+        {
+            flashLightTimer += Time.deltaTime;
+
+            if (flashLightTimer > flashLightTimeWindow)
+            {
+                // 超过0.5秒后重置状态
+                isWaitingForFlashLightSecondClick = false;
+                flashLightSkillReleased = false;
+            }
+        }
+    }
+
+    private IEnumerator ReleaseFlashLightSkill()
+    {
+        Debug.Log("Flashlight Skill Released!");
+
+        for (int i = 0; i < flashCount; i++)
+        {
+            // 关闭灯光
+            lampLight.enabled = false;
+            detectorCollider2D.enabled = false;
+            yield return new WaitForSeconds(flashDuration);
+            
+            // 开启灯光
+            lampLight.enabled = true;
+            detectorCollider2D.enabled = true;
+            yield return new WaitForSeconds(flashDuration);
+        }
+
+        // 确保最后一次闪烁后灯光是开启的
+        lampLight.enabled = true;
+        detectorCollider2D.enabled = true;
+        foreach (var bug in sectorCollider2D.GetObjectsInTrigger())
+        {
+            Destroy(bug);
+            Debug.Log($"Bug {bug} Destroyed!");
         }
     }
 
@@ -104,14 +191,20 @@ public class LampController : MonoBehaviour
 
     void EnterLaserMode()
     {
+
         lampLight.pointLightInnerAngle = Mathf.SmoothDamp(lampLight.pointLightInnerAngle, laserInnerAngle, ref innerAngleVelocity, angleSmoothTime);
         lampLight.pointLightOuterAngle = Mathf.SmoothDamp(lampLight.pointLightOuterAngle, laserOuterAngle, ref outerAngleVelocity, angleSmoothTime);
+
+
+
     }
 
     void ExitLaserMode()
     {
+
         lampLight.pointLightInnerAngle = Mathf.SmoothDamp(lampLight.pointLightInnerAngle, initialInnerAngle, ref innerAngleVelocity, angleSmoothTime);
         lampLight.pointLightOuterAngle = Mathf.SmoothDamp(lampLight.pointLightOuterAngle, initialOuterAngle, ref outerAngleVelocity, angleSmoothTime);
+
     }
 
     void HandleLaserRaycast()

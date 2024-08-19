@@ -74,7 +74,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 100
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 0.26067996, g: 0.2754833, b: 0.5471698, a: 1}
+  m_Color: {r: 0, g: 0.054053783, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -158,7 +158,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 10
   m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 1, b: 0.09856701, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -242,7 +242,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 100
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0, g: 0.9693699, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -294,12 +294,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5418701269020369819}
-  - component: {fileID: 2228047781022483419}
   - component: {fileID: 872188458200715731}
   - component: {fileID: -2568395042780104266}
   - component: {fileID: 6844197510448977600}
+  - component: {fileID: 1817349100280273271}
   m_Layer: 0
-  m_Name: Fly
+  m_Name: PhantomBug
   m_TagString: FlyCollider
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -322,26 +322,6 @@ Transform:
   - {fileID: 6564391162727775504}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2228047781022483419
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8093650135071591620}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8f28e91b33fd3de4e9a4b9ca826c93f4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  speed: 0.8
-  slowSpeed: 1
-  moveRadius: 0.8
-  floatAmplitude: 0.1
-  floatSpeed: 3
-  scoreValue: 1
-  fixedTargetPosition: {x: 0, y: 0}
-  destroyRadius: 0.5
 --- !u!58 &872188458200715731
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -418,3 +398,23 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &1817349100280273271
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8093650135071591620}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 436cc3849b83897479bd184410aae9fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 0.8
+  slowSpeed: 0.1
+  moveRadius: 0.8
+  floatAmplitude: 0.1
+  floatSpeed: 3
+  scoreValue: 5
+  fixedTargetPosition: {x: 0, y: 0}
+  destroyRadius: 0.5
