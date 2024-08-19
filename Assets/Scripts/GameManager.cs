@@ -13,6 +13,20 @@ public class GameManager : MonoBehaviour
         hasFlyInstructionShownOnceInScene = false;
         hasMothInstructionShownOnceInScene = false;
         hasPhantomBugInstructionShownOnceInScene = false;
+        // Ensure ScoreManager is properly reset
+        ResetScore();
     }
-
+    void ResetScore()
+    {
+        // Ensure the ScoreManager is available and reset its score
+        ScoreManager scoreManager = ScoreManager.instance;
+        if (scoreManager != null)
+        {
+            scoreManager.ResetScore(); // Reset the score
+        }
+        else
+        {
+            Debug.LogError("ScoreManager instance is not available.");
+        }
+    }
 }
