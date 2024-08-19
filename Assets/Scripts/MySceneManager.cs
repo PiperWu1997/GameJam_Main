@@ -3,11 +3,12 @@ using UnityEngine.SceneManagement;
 
 public class MySceneManager : MonoBehaviour
 {
-    public GameObject creditsImage;  // 拖拽 CreditsImage 对象到此字段
+    public GameObject creditsImage;  // Reference to the CreditsImage GameObject
 
     public void OnStartButtonClicked()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("MainScene");
+        // Load the MainScene
+        SceneManager.LoadScene("MainScene");
     }
 
     public void OnCreditsButtonClicked()
@@ -23,6 +24,28 @@ public class MySceneManager : MonoBehaviour
         if (creditsImage != null)
         {
             creditsImage.SetActive(false);
+        }
+    }
+
+    public void OnStartOverButtonClicked()
+    {
+        // Load the MainScene and reset the score
+        SceneManager.LoadScene("MainScene");
+        // Ensure ScoreManager is properly reset
+        ResetScore();
+    }
+
+    void ResetScore()
+    {
+        // Ensure the ScoreManager is available and reset its score
+        ScoreManager scoreManager = ScoreManager.instance;
+        if (scoreManager != null)
+        {
+            scoreManager.ResetScore(); // Reset the score
+        }
+        else
+        {
+            Debug.LogError("ScoreManager instance is not available.");
         }
     }
 }

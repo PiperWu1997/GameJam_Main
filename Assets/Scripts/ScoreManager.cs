@@ -1,15 +1,11 @@
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
-using UnityEngine.SceneManagement;
 
 public class ScoreManager : MonoBehaviour
 {
     public static ScoreManager instance; // Singleton instance to access ScoreManager globally
-    public TextMeshProUGUI scoreText; // Reference to the TextMeshProUGUI component for the current score
-    public TextMeshProUGUI highScoreText; // Reference to the TextMeshProUGUI component for the high score
-    public GameObject newHighScoreIndicator; // Reference to the GameObject that indicates a new high score
+    public TextMeshProUGUI scoreText; // Reference to the TextMeshProUGUI component for displaying the score
     private int score = 0; // Current session score
-    private int highScore; // Persistent high score
 
     void Awake()
     {
@@ -27,20 +23,14 @@ public class ScoreManager : MonoBehaviour
 
     void Start()
     {
-        // Load the high score from PlayerPrefs
-        highScore = PlayerPrefs.GetInt("HighScore", 0);
-        ResetScore(); // Reset score when the game starts
+        // Initialize the score and update the displayed number
+        ResetScore();
         UpdateScoreText();
-        UpdateHighScoreText();
+    }
 
-        // Ensure the indicator is initially hidden
-        if (newHighScoreIndicator != null)
-        {
-            newHighScoreIndicator.SetActive(false);
-        }
-
-        // Subscribe to scene loading events
-        SceneManager.sceneLoaded += OnSceneLoaded;
+    public int GetCurrentScore()
+    {
+        return score; // Return the current session score
     }
 
     public void AddScore(int amount)
@@ -49,34 +39,7 @@ public class ScoreManager : MonoBehaviour
         UpdateScoreText();
     }
 
-    public void EndLevel()
-    {
-        if (score > highScore)
-        {
-            // Save the new high score
-            highScore = score;
-            PlayerPrefs.SetInt("HighScore", highScore);
-            PlayerPrefs.Save();
-
-            // Activate the new high score indicator
-            if (newHighScoreIndicator != null)
-            {
-                newHighScoreIndicator.SetActive(true);
-            }
-        }
-        else
-        {
-            // Hide the new high score indicator if it's not a new high score
-            if (newHighScoreIndicator != null)
-            {
-                newHighScoreIndicator.SetActive(false);
-            }
-        }
-
-        UpdateHighScoreText();
-    }
-
-    void ResetScore()
+    public void ResetScore()
     {
         score = 0; // Reset the current session score to 0
         UpdateScoreText();
@@ -84,47 +47,19 @@ public class ScoreManager : MonoBehaviour
 
     void UpdateScoreText()
     {
+        if (scoreText == null)
+        {
+            // Attempt to find the scoreText object in the scene
+            scoreText = GameObject.Find("ScoreText")?.GetComponent<TextMeshProUGUI>();
+        }
+
         if (scoreText != null)
         {
-            scoreText.text = "Score: " + score;
+            scoreText.text = score.ToString(); // Display only the score number
         }
         else
         {
             Debug.LogError("ScoreText is not assigned in the ScoreManager.");
         }
-    }
-
-    void UpdateHighScoreText()
-    {
-        if (highScoreText != null)
-        {
-            highScoreText.text = "High Score: " + highScore;
-        }
-        else
-        {
-            Debug.LogError("HighScoreText is not assigned in the ScoreManager.");
-        }
-    }
-
-    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        // Dynamically find the scoreText and highScoreText in the new scene
-        scoreText = GameObject.Find("ScoreText")?.GetComponent<TextMeshProUGUI>();
-        highScoreText = GameObject.Find("HighScoreText")?.GetComponent<TextMeshProUGUI>();
-
-        // Reset score if returning to the game scene
-        if (scene.name == "MainScene")
-        {
-            ResetScore(); // Reset the score for a new game session
-        }
-
-        UpdateScoreText();
-        UpdateHighScoreText();
-    }
-
-    void OnDestroy()
-    {
-        // Unsubscribe from the scene loaded event to avoid memory leaks
-        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 }
