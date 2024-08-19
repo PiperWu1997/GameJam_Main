@@ -3,6 +3,8 @@ using TMPro;
 
 public class PhantomBugMovement : FlyMovement
 {
+    public int scoreWhenDestroyed = 5;
+    public int batteryDecreasedWhenHitLamp = 5;
     protected new void Start()
     {
         base.Start();
@@ -19,7 +21,12 @@ public class PhantomBugMovement : FlyMovement
         {
             isFlyingToTarget = true;
         }
-        
+        if (other.CompareTag("Lamp"))
+        {
+            Debug.LogWarning($"PhantomBug collided with Lamp! {batteryDecreasedWhenHitLamp}");
+            lampController.DecreaseBattery(batteryDecreasedWhenHitLamp);
+            Destroy(gameObject);
+        }
         if (!gameManager.hasPhantomBugInstructionShownOnceInScene)
         {
             instructor.ShowInstructions();
