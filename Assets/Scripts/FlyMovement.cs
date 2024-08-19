@@ -64,7 +64,7 @@ public class FlyMovement : MonoBehaviour
         }
     }
 
-    private void Update()
+    protected virtual void Update()
     {
         if (isFlyingToTarget)
         {

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(PolygonCollider2D))]
@@ -10,9 +11,11 @@ public class SectorCollider2D : MonoBehaviour
 
     private PolygonCollider2D polygonCollider;
     private LampController lampController;
+    private List<GameObject> bugsInCollider;
 
     void Start()
     {
+        bugsInCollider = new List<GameObject>();
         segmentCount = 10;
         angle = 60f;
         direction = Vector2.up;
@@ -29,11 +32,41 @@ public class SectorCollider2D : MonoBehaviour
         }
     }
 
+    
+    // 当有GameObject进入触发器范围时调用
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        // 将进入的GameObject添加到列表中
+        if (!bugsInCollider.Contains(other.gameObject) && other.name.Contains("Phantom"))
+        {
+            bugsInCollider.Add(other.gameObject);
+            Debug.Log("Object entered: " + other.gameObject.name);
+        }
+    }
+
+    // 当有GameObject离开触发器范围时调用
+    void OnTriggerExit2D(Collider2D other)
+    {
+        // 将离开的GameObject从列表中移除
+        if (bugsInCollider.Contains(other.gameObject))
+        {
+            bugsInCollider.Remove(other.gameObject);
+            Debug.Log("Object exited: " + other.gameObject.name);
+        }
+    }
+
+    // 可以在其他地方访问当前在触发器内的所有GameObject
+    public GameObject[] GetObjectsInTrigger()
+    {
+        return bugsInCollider.ToArray();
+    }
+    
     void Update()
     {
         if (lampController != null)
         {
             radius = 0.8f * Mathf.Max(lampController.CurrentRange - 1f, 0);
+            angle = 0.8f * Mathf.Max(lampController.lampLight.pointLightInnerAngle, 0);
             UpdateCollider();
         }
     }
