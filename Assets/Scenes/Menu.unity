@@ -152,14 +152,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72f38a83f69ff4747abfea513d8668ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  videoPlayer: {fileID: 602842082}
-  videoClips:
-  - <iframe src="https://drive.google.com/file/d/1lnlSrgmKmA6zakCG0XdJD_hrVsUaSMVr/preview"
-    width="640" height="480" allow="autoplay"></iframe>
-  - <iframe src="https://drive.google.com/file/d/1y4Mw7RiA0sOCoWzo1-gMiC2wfquBkO2U/preview"
-    width="640" height="480" allow="autoplay"></iframe>
-  nextButton: {fileID: 815210599}
-  sceneToLoadAfterVideos: MainScene
+  creditsImage: {fileID: 294600937}
+  spriteRenderer: {fileID: 484975760}
+  fadeDuration: 1
 --- !u!4 &3032583
 Transform:
   m_ObjectHideFlags: 0
