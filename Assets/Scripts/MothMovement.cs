@@ -107,12 +107,6 @@ public class MothMovement : FlyMovement
                 audioSource.PlayOneShot(triggerEnterClip);
             }
         }
-
-        if (!gameManager.hasMothInstructionShownOnceInScene)
-        {
-            instructor.ShowInstructions();
-            gameManager.hasMothInstructionShownOnceInScene = true;
-        }
     }
 
     void OnTriggerExit2D(Collider2D other)
