@@ -1,18 +1,51 @@
-﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.SceneManagement;
-using System.Collections;  // 确保引用了这个命名空间
+using UnityEngine.UI;
+using UnityEngine.Video;
 
-public class MySceneManager : MonoBehaviour
+public class VideoController : MonoBehaviour
 {
-    public GameObject creditsImage;  // Reference to the CreditsImage GameObject
+    public VideoPlayer videoPlayer;
+    public Button nextButton;
+    public VideoClip[] videoClips;  // 视频片段数组
+    private int currentVideoIndex = 0;
     public SpriteRenderer spriteRenderer;  // Reference to the SpriteRenderer component
     public float fadeDuration = 1.0f;  // Duration of the fade effect
 
-    public void OnStartButtonClicked()
+    void Start()
     {
-        StartCoroutine(FadeAndLoadScene("InstructionScene"));
+        // 初始化按钮
+        nextButton.onClick.AddListener(OnNextButtonClicked);
+
+        // 播放第一个视频
+        PlayVideo(currentVideoIndex);
     }
 
+    void PlayVideo(int index)
+    {
+        if (index < videoClips.Length)
+        {
+            videoPlayer.clip = videoClips[index];
+            videoPlayer.Play();
+        }
+    }
+
+    void OnNextButtonClicked()
+    {
+        currentVideoIndex++;
+        if (currentVideoIndex < videoClips.Length)
+        {
+            PlayVideo(currentVideoIndex);
+        }
+        else
+        {
+            // 如果所有视频播放完毕，跳转到主场景
+            StartCoroutine(FadeAndLoadScene("MainScene"));
+        }
+    }
+    
     private IEnumerator FadeAndLoadScene(string sceneName)
     {
         if (spriteRenderer != null)
@@ -40,27 +73,5 @@ public class MySceneManager : MonoBehaviour
 
         // Load the MainScene
         SceneManager.LoadScene(sceneName);
-    }
-
-    public void OnCreditsButtonClicked()
-    {
-        if (creditsImage != null)
-        {
-            creditsImage.SetActive(true);
-        }
-    }
-
-    public void OnCloseCreditsButtonClicked()
-    {
-        if (creditsImage != null)
-        {
-            creditsImage.SetActive(false);
-        }
-    }
-
-    public void OnStartOverButtonClicked()
-    {
-        // Load the MainScene and reset the score
-        SceneManager.LoadScene("MainScene");
     }
 }
