@@ -26,7 +26,7 @@ Transform:
   m_GameObject: {fileID: 5058871964298267315}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 9.2, y: 0, z: 0}
+  m_LocalPosition: {x: 3.37, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -76,9 +76,9 @@ Transform:
   m_GameObject: {fileID: 7626198462633492394}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -14.32, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 8837675583808485508}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -99,7 +99,7 @@ MonoBehaviour:
   m_BlendStyleIndex: 0
   m_FalloffIntensity: 0.5
   m_Color: {r: 0, g: 0.18060637, b: 1, a: 1}
-  m_Intensity: 5.2
+  m_Intensity: 2.99
   m_LightVolumeIntensity: 1
   m_LightVolumeIntensityEnabled: 0
   m_ApplyToSortingLayers: 00000000
@@ -121,7 +121,7 @@ MonoBehaviour:
   m_PointLightInnerAngle: 360
   m_PointLightOuterAngle: 360
   m_PointLightInnerRadius: 0
-  m_PointLightOuterRadius: 0.68
+  m_PointLightOuterRadius: 0.52
   m_ShapeLightParametricSides: 5
   m_ShapeLightParametricAngleOffset: 0
   m_ShapeLightParametricRadius: 1
@@ -145,6 +145,7 @@ GameObject:
   - component: {fileID: 1802451384151262279}
   - component: {fileID: 8160241947237581932}
   - component: {fileID: 8642242289506522708}
+  - component: {fileID: 3724923496924927759}
   - component: {fileID: 5393359054066437570}
   m_Layer: 3
   m_Name: Beetle
@@ -163,8 +164,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.014, y: 0.014, z: 0.014}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 2578715672889955750}
   m_Father: {fileID: 8046650910855525224}
@@ -210,12 +211,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 10
-  m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 5b1feb5865b30684287395f7de20623e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 24.63351, y: 23.130001}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -255,7 +256,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 1.31
+  m_Radius: 28.86
 --- !u!50 &8160241947237581932
 Rigidbody2D:
   serializedVersion: 4
@@ -303,6 +304,18 @@ MonoBehaviour:
   proximityClip: {fileID: 8300000, guid: 3283f6630edaf024c9b6ecefde11f748, type: 3}
   pitchMin: 0.9
   pitchMax: 1.1
+--- !u!114 &3724923496924927759
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7825948673428648594}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1384daa2f0256d429416658ea8b29c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!82 &5393359054066437570
 AudioSource:
   m_ObjectHideFlags: 0
