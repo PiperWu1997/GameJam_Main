@@ -9,6 +9,12 @@ public class MothMovement : FlyMovement
 
     private float inactiveTime = 0f; // Time the moth has been inactive
 
+    public AudioSource audioSource;  // Reference to the AudioSource component
+    public AudioClip triggerEnterClip;  // AudioClip to play on trigger enter
+
+    public float pitchMin = 0.9f; // Minimum pitch value
+    public float pitchMax = 1.1f; // Maximum pitch value
+
     protected new void Start()
     {
         base.Start();
@@ -18,6 +24,16 @@ public class MothMovement : FlyMovement
             if (mainCamera == null)
             {
                 Debug.LogError("Main camera not found. Please assign a Camera in the inspector.");
+            }
+        }
+
+        // Ensure AudioSource component is attached
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+            if (audioSource == null)
+            {
+                Debug.LogError("AudioSource component not found. Please assign it in the inspector.");
             }
         }
     }
@@ -32,7 +48,7 @@ public class MothMovement : FlyMovement
             {
                 if (lampController != null)
                 {
-                    lampController.DecreaseBattery(damageToLight); // Decrease battery by 20
+                    lampController.DecreaseBattery(damageToLight); // Decrease battery by damageToLight
                 }
                 Destroy(gameObject);
             }
@@ -92,8 +108,15 @@ public class MothMovement : FlyMovement
         if (other.CompareTag("LampLight"))
         {
             isFlyingToTarget = true;
+
+            // Play audio with random pitch
+            if (audioSource != null && triggerEnterClip != null)
+            {
+                audioSource.pitch = Random.Range(pitchMin, pitchMax);
+                audioSource.PlayOneShot(triggerEnterClip);
+            }
         }
-        
+
         if (!gameManager.hasMothInstructionShownOnceInScene)
         {
             instructor.ShowInstructions();
