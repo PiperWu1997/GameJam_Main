@@ -1,9 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 using UnityEngine.Video;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class VideoController : MonoBehaviour
 {
@@ -13,6 +12,7 @@ public class VideoController : MonoBehaviour
     private int currentVideoIndex = 0;
     public SpriteRenderer spriteRenderer;  // Reference to the SpriteRenderer component
     public float fadeDuration = 1.0f;  // Duration of the fade effect
+    public float fadeDurationBetweenVideos = 3.0f;  // Duration of the fade effect
 
     void Start()
     {
@@ -37,7 +37,7 @@ public class VideoController : MonoBehaviour
         currentVideoIndex++;
         if (currentVideoIndex < videoClips.Length)
         {
-            PlayVideo(currentVideoIndex);
+            StartCoroutine(SwitchVideoCoroutine());
         }
         else
         {
@@ -46,6 +46,39 @@ public class VideoController : MonoBehaviour
         }
     }
     
+    private IEnumerator SwitchVideoCoroutine()
+    {
+        // 先等待当前视频的淡出
+        yield return StartCoroutine(FadeOutCurrentVideo());
+
+        // 播放下一个视频
+    }
+
+    private IEnumerator FadeOutCurrentVideo()
+    {
+        videoPlayer.Stop();
+        PlayVideo(currentVideoIndex);
+        if (spriteRenderer != null)
+        {
+            Color color = spriteRenderer.color;
+            float elapsedTime = 0f;
+
+            // Fade out the current video
+            while (elapsedTime < fadeDurationBetweenVideos)
+            {
+                elapsedTime += Time.deltaTime;
+                color.a = Mathf.Clamp01(1 - (elapsedTime / fadeDurationBetweenVideos));
+                spriteRenderer.color = color;
+                yield return null;
+            }
+
+            // Ensure transparency is set to 0%
+            color.a = 0f;
+            spriteRenderer.color = color;
+        }
+        // Optionally, you might want to stop the video playback while waiting
+    }
+
     private IEnumerator FadeAndLoadScene(string sceneName)
     {
         if (spriteRenderer != null)
