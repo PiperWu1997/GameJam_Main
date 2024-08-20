@@ -27,7 +27,7 @@ public class InstructionAnimController : MonoBehaviour
     {
         if (count == 0)
         {
-            firstAnimator.enabled = false; // 禁用第一个 Animator
+            firstAnimator.gameObject.SetActive(false); // 禁用第一个 Animator
             // 启用第二个 Animator 并播放第二个动画
             secondAnimator.enabled = true;
             // secondAnimator.Play("Instruction_2");
