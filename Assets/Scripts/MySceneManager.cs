@@ -63,4 +63,10 @@ public class MySceneManager : MonoBehaviour
         // Load the MainScene and reset the score
         SceneManager.LoadScene("MainScene");
     }
+    
+    public void OnQuit()
+    {
+        // Load the MainScene and reset the score
+        SceneManager.LoadScene("Menu");
+    }
 }
