@@ -1064,8 +1064,8 @@ Transform:
   m_GameObject: {fileID: 929409652}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0.8141155, w: 0.58070296}
-  m_LocalPosition: {x: -0.24, y: 0.00999999, z: 0}
-  m_LocalScale: {x: 0.08000001, y: 0.08000001, z: 0.08}
+  m_LocalPosition: {x: -0.279, y: 0.257, z: 0}
+  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
@@ -1149,7 +1149,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: -1, w: 0}
   m_LocalPosition: {x: 0, y: -0.18, z: 0}
-  m_LocalScale: {x: 0.08, y: 0.08, z: 0.08}
+  m_LocalScale: {x: 0.099999994, y: 0.099999994, z: 0.099999994}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 68032897}
@@ -1236,7 +1236,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   flyPrefab: {fileID: 6117630786685879107, guid: b5f2f9615e7a79e40a41dc9027c19f75, type: 3}
-  mothPrefab: {fileID: 2156408842491091564, guid: b43ee8cf1ae3ca74e9bba7d05c193c5e, type: 3}
+  mothPrefab: {fileID: 4796517240534364021, guid: b43ee8cf1ae3ca74e9bba7d05c193c5e, type: 3}
   phantomPrefab: {fileID: 8093650135071591620, guid: 88d6da5563cef2449a24d03e50930605, type: 3}
   lamp: {fileID: 68032897}
   spawnRadius: 2

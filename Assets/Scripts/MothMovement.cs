@@ -83,9 +83,6 @@ public class MothMovement : FlyMovement
                 transform.position = Vector2.Lerp(transform.position, targetPosition, Time.deltaTime * speed);
             }
         }
-
-        float floatOffset = Mathf.Sin(Time.time * floatSpeed) * floatAmplitude;
-        scaleGameObject.localScale = new Vector3(1f, 1f + 1f * floatOffset, 1f);
     }
 
     bool IsOutOfBounds(Vector3 position)
