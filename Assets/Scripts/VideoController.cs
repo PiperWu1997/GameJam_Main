@@ -75,6 +75,7 @@ public class VideoController : MonoBehaviour
             // Ensure transparency is set to 0%
             color.a = 0f;
             spriteRenderer.color = color;
+            spriteRenderer.gameObject.SetActive(false);
         }
         // Optionally, you might want to stop the video playback while waiting
     }
