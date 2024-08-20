@@ -57,7 +57,7 @@ public class ScoreTracker : MonoBehaviour
     {
         if (highScoreText != null)
         {
-            highScoreText.text = "High Score: " + highScore.ToString(); // Display high score
+            highScoreText.text = highScore.ToString(); // Display high score
         }
         else
         {
@@ -66,7 +66,7 @@ public class ScoreTracker : MonoBehaviour
 
         if (lastScoreText != null)
         {
-            lastScoreText.text = "Last Score: " + lastScore.ToString(); // Display last score
+            lastScoreText.text = lastScore.ToString(); // Display last score
         }
         else
         {

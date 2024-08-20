@@ -9,12 +9,6 @@ public class MothMovement : FlyMovement
 
     private float inactiveTime = 0f; // Time the moth has been inactive
 
-    public AudioSource audioSource;  // Reference to the AudioSource component
-    public AudioClip triggerEnterClip;  // AudioClip to play on trigger enter
-
-    public float pitchMin = 0.9f; // Minimum pitch value
-    public float pitchMax = 1.1f; // Maximum pitch value
-
     protected new void Start()
     {
         base.Start();

@@ -10,7 +10,7 @@ public class MySceneManager : MonoBehaviour
 
     public void OnStartButtonClicked()
     {
-        StartCoroutine(FadeAndLoadScene("MainScene"));
+        StartCoroutine(FadeAndLoadScene("InstructionScene"));
     }
 
     private IEnumerator FadeAndLoadScene(string sceneName)
