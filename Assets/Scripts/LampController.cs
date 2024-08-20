@@ -50,6 +50,8 @@ public class LampController : MonoBehaviour
     public int flashCount; // 闪烁次数
     public float flashDuration; // 每次闪烁的持续时间
 
+    public AudioClip batteryIncreaseClip;  // AudioClip to play when the battery increases
+    public AudioClip batteryDecreaseClip;  // AudioClip to play when the battery decreases
     public AudioSource lampAudioSource;  // Reference to the AudioSource component
     public AudioClip lampAudioClip;  // Reference to the AudioClip to be played
     public AudioClip clickAudioClip;  // Reference to the AudioClip for clicking
@@ -72,6 +74,15 @@ public class LampController : MonoBehaviour
             lampAudioSource.clip = lampAudioClip;
             lampAudioSource.loop = true;  // Ensure the audio loops
             lampAudioSource.volume = 0f;  // Start with volume at 0
+        }
+
+        if (lampAudioSource == null)
+        {
+            lampAudioSource = GetComponent<AudioSource>();
+            if (lampAudioSource == null)
+            {
+                Debug.LogError("AudioSource component not found. Please assign it in the inspector.");
+            }
         }
 
         flashCount = 4;
@@ -314,6 +325,12 @@ public class LampController : MonoBehaviour
         currentBattery = Mathf.Clamp(currentBattery - amount, 0, maxBattery);
         batterySlider.value = currentBattery;
 
+        // Play the battery decrease audio
+        if (batteryDecreaseClip != null && lampAudioSource != null)
+        {
+            lampAudioSource.PlayOneShot(batteryDecreaseClip);
+        }
+
         if (currentBattery <= 0)
         {
             lampLight.enabled = false;
@@ -325,6 +342,12 @@ public class LampController : MonoBehaviour
     {
         currentBattery = Mathf.Clamp(currentBattery + amount, 0, maxBattery);
         batterySlider.value = currentBattery;
+
+        // Play the battery increase audio
+        if (batteryIncreaseClip != null && lampAudioSource != null)
+        {
+            lampAudioSource.PlayOneShot(batteryIncreaseClip);
+        }
     }
 
     private void LoadNextLevel()

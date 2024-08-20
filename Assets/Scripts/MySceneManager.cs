@@ -1,66 +1,66 @@
 ﻿using UnityEngine;
+using UnityEngine.Video;
 using UnityEngine.SceneManagement;
-using System.Collections;  // 确保引用了这个命名空间
+using UnityEngine.UI;
 
 public class MySceneManager : MonoBehaviour
 {
-    public GameObject creditsImage;  // Reference to the CreditsImage GameObject
-    public SpriteRenderer spriteRenderer;  // Reference to the SpriteRenderer component
-    public float fadeDuration = 1.0f;  // Duration of the fade effect
+    public VideoPlayer videoPlayer;  // Reference to the VideoPlayer component
+    public string[] videoClips;  // Array of video file paths
+    private int currentVideoIndex = 0;  // Track the current video index
+
+    public Button nextButton;  // Reference to the NextButton
+    public string sceneToLoadAfterVideos = "MainScene";  // The scene to load after all videos are played
+
+    void Start()
+    {
+        if (videoClips.Length > 0)
+        {
+            PlayVideo(currentVideoIndex);
+        }
+
+        if (nextButton != null)
+        {
+            nextButton.onClick.AddListener(OnNextButtonClicked);
+        }
+    }
 
     public void OnStartButtonClicked()
     {
-        StartCoroutine(FadeAndLoadScene("MainScene"));
+        currentVideoIndex = 0;
+        PlayVideo(currentVideoIndex);
     }
 
-    private IEnumerator FadeAndLoadScene(string sceneName)
+    public void OnNextButtonClicked()
     {
-        if (spriteRenderer != null)
+        if (currentVideoIndex < videoClips.Length - 1)
         {
-            Color color = spriteRenderer.color;
-            float elapsedTime = 0f;
-
-            // Set initial transparency to 0
-            color.a = 0f;
-            spriteRenderer.color = color;
-
-            // Gradually increase transparency to 100%
-            while (elapsedTime < fadeDuration)
-            {
-                elapsedTime += Time.deltaTime;
-                color.a = Mathf.Clamp01(elapsedTime / fadeDuration);
-                spriteRenderer.color = color;
-                yield return null;
-            }
-
-            // Ensure transparency is set to 100%
-            color.a = 1f;
-            spriteRenderer.color = color;
+            currentVideoIndex++;
+            PlayVideo(currentVideoIndex);
         }
-
-        // Load the MainScene
-        SceneManager.LoadScene(sceneName);
-    }
-
-    public void OnCreditsButtonClicked()
-    {
-        if (creditsImage != null)
+        else
         {
-            creditsImage.SetActive(true);
+            SceneManager.LoadScene(sceneToLoadAfterVideos);
         }
     }
 
-    public void OnCloseCreditsButtonClicked()
+    private void PlayVideo(int index)
     {
-        if (creditsImage != null)
+        if (videoPlayer != null && videoClips.Length > index)
         {
-            creditsImage.SetActive(false);
+            videoPlayer.url = System.IO.Path.Combine(Application.streamingAssetsPath, videoClips[index]);
+            videoPlayer.isLooping = true;
+            videoPlayer.Play();
         }
     }
 
     public void OnStartOverButtonClicked()
     {
-        // Load the MainScene and reset the score
         SceneManager.LoadScene("MainScene");
+    }
+
+    public void OnVideoFinished(VideoPlayer vp)
+    {
+        OnNextButtonClicked();
     }
 }

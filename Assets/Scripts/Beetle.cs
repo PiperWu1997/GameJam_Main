@@ -12,23 +12,54 @@ public class Beetle : MonoBehaviour
 
     private bool isLaserMode = false;  // 是否处于激光模式
 
+    public AudioSource audioSource;  // Reference to the AudioSource component
+    public AudioClip proximityClip;  // AudioClip to play when within radius
+    public float pitchMin = 0.9f;  // Minimum pitch value
+    public float pitchMax = 1.1f;  // Maximum pitch value
+    private bool hasPlayedAudio = false; // To ensure audio plays only once
+
     void Start()
     {
         lampController = FindObjectOfType<LampController>();  // 获取 LampController 实例
-        // Find the ScoreManager component in the scene
-        scoreManager = FindObjectOfType<ScoreManager>();
+        scoreManager = FindObjectOfType<ScoreManager>();  // 获取 ScoreManager 实例
         if (scoreManager == null)
         {
             Debug.LogError("ScoreManager not found in the scene.");
+        }
+
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+            if (audioSource == null)
+            {
+                Debug.LogError("AudioSource component not found. Please assign it in the inspector.");
+            }
         }
     }
 
     void Update()
     {
+        // 检查甲虫是否在灯的半径4以内
+        float distanceToLamp = Vector2.Distance(transform.position, lampController.transform.position);
+        if (distanceToLamp <= 4f && !hasPlayedAudio)
+        {
+            PlayProximityAudio();
+            hasPlayedAudio = true; // Ensure the audio is played only once
+        }
+
         // 如果激光模式激活且暴露时间达到了要求，则销毁甲虫
         if (isLaserMode && laserExposureTime >= requiredExposureTime)
         {
             DestroyBeetle(true);
+        }
+    }
+
+    private void PlayProximityAudio()
+    {
+        if (audioSource != null && proximityClip != null)
+        {
+            audioSource.pitch = Random.Range(pitchMin, pitchMax);
+            audioSource.PlayOneShot(proximityClip);
         }
     }
 
