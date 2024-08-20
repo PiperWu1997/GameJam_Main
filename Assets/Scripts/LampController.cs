@@ -60,6 +60,9 @@ public class LampController : MonoBehaviour
     public float volumeIncreaseRate = 0.5f;  // Volume increase rate when the button is held
     public float volumeDecreaseRate = 1.0f;  // Volume decrease rate when the button is released
 
+    public SpriteRenderer spriteRenderer;  // Reference to the SpriteRenderer component
+    public float fadeDuration = 1.0f;  // Duration of the fade effect
+
     void Start()
     {
         // Find the ScoreManager component in the scene
@@ -352,6 +355,35 @@ public class LampController : MonoBehaviour
 
     private void LoadNextLevel()
     {
-        SceneManager.LoadScene("EndScene");
+        StartCoroutine(FadeAndLoadScene("EndScene"));
+    }
+    
+    private IEnumerator FadeAndLoadScene(string sceneName)
+    {
+        if (spriteRenderer != null)
+        {
+            Color color = spriteRenderer.color;
+            float elapsedTime = 0f;
+
+            // Set initial transparency to 0
+            color.a = 0f;
+            spriteRenderer.color = color;
+
+            // Gradually increase transparency to 100%
+            while (elapsedTime < fadeDuration)
+            {
+                elapsedTime += Time.deltaTime;
+                color.a = 1f;
+                spriteRenderer.color = color;
+                yield return null;
+            }
+
+            // Ensure transparency is set to 100%
+            color.a = 1f;
+            spriteRenderer.color = color;
+        }
+
+        // Load the MainScene
+        SceneManager.LoadScene(sceneName);
     }
 }
