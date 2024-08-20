@@ -1143,19 +1143,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 815210600}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 3032582}
-        m_TargetAssemblyTypeName: MySceneManager, Assembly-CSharp
-        m_MethodName: OnNextButtonClicked
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &815210600
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2293,10 +2281,11 @@ MonoBehaviour:
   videoPlayer: {fileID: 2016849111}
   nextButton: {fileID: 815210599}
   videoClips:
-  - {fileID: 32900000, guid: db37c0c4217ee18478e9dc970a25a18c, type: 3}
-  - {fileID: 32900000, guid: 5eb1fd218b8b27a44b39b38b5a2b7c74, type: 3}
+  - {fileID: 32900000, guid: a42b116fbf5e4ba489c2f5108ce18d75, type: 3}
+  - {fileID: 32900000, guid: 7d852c5be5c18704fa63b796cf511995, type: 3}
   spriteRenderer: {fileID: 1161903588}
   fadeDuration: 1
+  fadeDurationBetweenVideos: 1
 --- !u!4 &2016849110
 Transform:
   m_ObjectHideFlags: 0
